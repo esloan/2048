@@ -11,19 +11,32 @@ public class GUI extends GraphicsProgram {
 	private static final double WIDTH = COLUMNS*(SIZE+SEP)+SEP;
 	private static final double HEIGHT = ROWS*(SIZE+SEP)+SEP;
 	static GUI g = new GUI();
+	static GRect[][] grid;
 	
-	public static void main(String[] args){
-		String[] sizeArgs = { "width=" + (int)WIDTH, "height=" + (int)HEIGHT};
-		GRect[][] grid = new GRect[ROWS][COLUMNS];
-		g.start(sizeArgs);
+	public GUI(){
+		grid = new GRect[ROWS][COLUMNS];
 		for(int i=0; i<ROWS;i++){
 			for(int j=0;j<COLUMNS;j++){
 				grid[i][j]=new GRoundRect(SIZE,SIZE);
 				grid[i][j].setFilled(true);
 				grid[i][j].setFillColor(Color.MAGENTA);
-				g.add(grid[i][j],SEP+(SIZE+SEP)*i,SEP+(SIZE+SEP)*j);
+				grid[i][j].setLocation(SEP+(SIZE+SEP)*i,SEP+(SIZE+SEP)*j);
 			}
 		}
+	}
+	
+	public static void main(String[] args){
+		String[] sizeArgs = { "width=" + (int)WIDTH, "height=" + (int)HEIGHT};
+		g.start(sizeArgs);
+		for(int i=0;i<ROWS;i++){
+			for(int j=0;j<COLUMNS;j++){
+				g.add(grid[i][j]);
+			}
+		}
+		
+		Blocks block = new Blocks();
+		g.add(block.b);
+		g.add(block.l);
 		
 	}
 }
