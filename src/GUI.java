@@ -1,4 +1,5 @@
 import java.awt.Color;
+import java.util.ArrayList;
 
 import acm.graphics.*;
 import acm.program.GraphicsProgram;
@@ -12,6 +13,7 @@ public class GUI extends GraphicsProgram {
 	private static final double HEIGHT = ROWS*(SIZE+SEP)+SEP;
 	static GUI g = new GUI();
 	static GRect[][] grid;
+	static ArrayList<Blocks> bl = new ArrayList<Blocks>();
 	
 	public GUI(){
 		grid = new GRect[ROWS][COLUMNS];
@@ -34,9 +36,12 @@ public class GUI extends GraphicsProgram {
 			}
 		}
 		
-		Blocks block = new Blocks();
-		g.add(block.b);
-		g.add(block.l);
-		
+	}
+	
+	public void draw(){
+		for(Blocks block: bl){
+			g.add(block.b);
+			g.add(block.l);
+		}
 	}
 }
