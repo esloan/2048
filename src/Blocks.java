@@ -64,12 +64,48 @@ public class Blocks extends GraphicsProgram{
 	}
 
 	public void up(){
-		double x = xPos-SIZE-SEP;
+		double x = xPos;
 		double y = yPos-SIZE-SEP;
 		if(x>0&&x<WIDTH&&y>0&&y<HEIGHT){
 			if(getElementAt(x,y)==null){
-				b.move(-SIZE,-SEP);
-				l.move(-SIZE,-SEP);
+				b.move(0,-SIZE-SEP);
+				l.move(0,-SIZE-SEP);
+			}
+			else{
+				if(getElementAt(x,y).getColor()==b.getColor()){
+					getElementAt(x,y).setVisible(false);
+					l.setLabel(String.valueOf(getLabel()*2));
+				}
+			}
+		}
+	}
+	
+	public void down(){
+		double x = xPos;
+		double y = yPos+SIZE+SEP;
+		if(x>0&&x<WIDTH&&y>0&&y<HEIGHT){
+			if(getElementAt(x,y)==null){
+				b.setLocation(x,y);
+				b.sendToFront();
+				l.setLocation(x+SIZE/2,y+SIZE/2);
+			}
+			else{
+				if(getElementAt(x,y).getColor()==b.getColor()){
+					getElementAt(x,y).setVisible(false);
+					l.setLabel(String.valueOf(getLabel()*2));
+				}
+			}
+		}
+	}
+	
+	
+	public void right(){
+		double x = xPos+SIZE+SEP;
+		double y = yPos;
+		if(x>0&&x<WIDTH&&y>0&&y<HEIGHT){
+			if(getElementAt(x,y)==null){
+				b.move(SIZE+SEP,0);
+				l.move(SIZE+SEP,0);
 			}
 			else{
 				if(getElementAt(x,y).getColor()==b.getColor()){

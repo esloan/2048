@@ -35,11 +35,19 @@ public class GUI extends GraphicsProgram {
 				g.add(grid[i][j]);
 			}
 		}
+		//while(true){
+			bl.add(new Blocks(SEP,SEP));
+			draw();
+			for(Blocks block:bl){block.down();}
+			draw();
+		
 		
 	}
 	
-	public void draw(){
+	public static void draw(){
 		for(Blocks block: bl){
+			g.remove(block.b);
+			g.remove(block.l);
 			g.add(block.b);
 			g.add(block.l);
 		}
