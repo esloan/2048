@@ -1,4 +1,7 @@
+import java.applet.Applet;
 import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Image;
 
 import acm.graphics.*;
 import acm.program.GraphicsProgram;
@@ -10,20 +13,31 @@ public class GUI extends GraphicsProgram {
 	private static final int SEP = 10; //separator size (pixels)
 	private static final double WIDTH = COLUMNS*(SIZE+SEP)+SEP;
 	private static final double HEIGHT = ROWS*(SIZE+SEP)+SEP;
-	static GUI g = new GUI();
-	
-	public static void main(String[] args){
-		String[] sizeArgs = { "width=" + (int)WIDTH, "height=" + (int)HEIGHT};
+	static GUI gui = new GUI();
+
+	public void init()
+	{
+		//setBackground(Color.blue);//sets background color
+
 		GRect[][] grid = new GRect[ROWS][COLUMNS];
-		g.start(sizeArgs);
 		for(int i=0; i<ROWS;i++){
 			for(int j=0;j<COLUMNS;j++){
 				grid[i][j]=new GRoundRect(SIZE,SIZE);
 				grid[i][j].setFilled(true);
 				grid[i][j].setFillColor(Color.MAGENTA);
-				g.add(grid[i][j],SEP+(SIZE+SEP)*i,SEP+(SIZE+SEP)*j);
+				gui.add(grid[i][j],SEP+(SIZE+SEP)*i,SEP+(SIZE+SEP)*j);
 			}
 		}
-		
 	}
+	/**
+	 * This method runs the animation. 
+	 */
+	public void run()
+	{
+		String[] sizeArgs = { "width=" + (int)WIDTH, "height=" + (int)HEIGHT};
+		if(!gui.isStarted()){
+			gui.start(sizeArgs);
+		}
+	}
+
 }
