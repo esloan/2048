@@ -1,10 +1,12 @@
 import java.applet.Applet;
+import java.awt.*;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Image;
-
+import java.util.ArrayList;
 import acm.graphics.*;
 import acm.program.GraphicsProgram;
+import java.util.Random;
 
 public class GUI extends GraphicsProgram {
     private static final int ROWS = 4; //number of rows in the background
@@ -14,7 +16,7 @@ public class GUI extends GraphicsProgram {
     private static final double WIDTH = COLUMNS*(SIZE+SEP)+SEP;
     private static final double HEIGHT = ROWS*(SIZE+SEP)+SEP;
     static GUI gui = new GUI();
-
+    private int[][] Grid= new int [ROWS][COLUMNS];
     public void init()
     {
         //setBackground(Color.blue);//sets background color
@@ -40,8 +42,35 @@ public class GUI extends GraphicsProgram {
             }
         }
 
-
-        
+    /**
+     * This method adds tiles to the grid.
+     */
+      private void addRandom(int n)
+      {
+          ArrayList<Point> available= new ArrayList<Point>();
+          for(int i=0; i<Grid.length; i++)
+          {
+              for(int m=0; m<Grid.length; m++)
+              {
+                  if (Grid[i][m]==0)
+                  {
+                      available.add(new Point(i,m));
+                    }
+                }
+            }
+           Random r= new Random();
+           if(available. isEmpty())
+           {
+               System.out.println("Game Over");
+               return;
+            }
+            for(int i=0; i<n; i++)
+            {
+                Point p= available.get(r.nextInt(available.size()));
+                Grid[(int)p.getX()][(int)p.getY()]=r.nextInt(4)==1?4:2;
+                available.remove(p);
+            }
+        }
     
     
     private Color getTileColor(Tiles t) {
