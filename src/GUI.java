@@ -48,7 +48,6 @@ public class GUI extends GraphicsProgram {
         Color color = new Color(255, 255 - t.value/8, 15);
         return color;
     }
-
 }
 
     
