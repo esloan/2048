@@ -20,7 +20,7 @@ public class GUI extends GraphicsProgram {
 	static GUI gui = new GUI();
 	private int[][] Grid = new int[ROWS][COLUMNS];
 	ArrayList<Point> available = new ArrayList<Point>();
-	ArrayList<Point> full = new ArrayList<Point>();
+	ArrayList<Tile> tiles = new ArrayList<Tile>();
 
 	public void init() {
 		// setBackground(Color.blue);//sets background color
@@ -41,8 +41,6 @@ public class GUI extends GraphicsProgram {
 			for (int m = 0; m < Grid.length; m++) {
 				if (Grid[i][m] == 0) {
 					available.add(new Point(i,m));
-				} else {
-					full.add(new Point(i,m));
 				}
 			}
 		}
@@ -59,6 +57,7 @@ public class GUI extends GraphicsProgram {
 		if (!gui.isStarted()) {
 			gui.start(sizeArgs);
 		}
+		
 	}
 
 	/**
@@ -77,6 +76,7 @@ public class GUI extends GraphicsProgram {
 			Tile t = new Tile((int)( p.getX()*(SIZE + SEP)+SEP), (int) (p.getY()*(SIZE + SEP)+SEP),
 					r.nextInt(4) == 1 ? 4 : 2);
 			gui.add(t.tile);
+			tiles.add(t);
 			available.remove(p);
 		}
 	}
@@ -90,32 +90,54 @@ public class GUI extends GraphicsProgram {
 	}
 
 	public void keyPressed(KeyEvent e) {
-		displayInfo(e, "KEY PRESSED: ");
+		int keyCode = e.getKeyCode();
+		if (keyCode == 37) // left Key
+		{
+			System.out.println("left");
+			
+		}
+		else if (keyCode == 38) // up
+		{
+			System.out.println("up");
+			for (int i = 0; i < tiles.size(); i++) {
+				Tile t = tiles.get(i);
+				if(t.getY()>10){
+					int x=(int)(t.getX()-SEP)/(int)(SEP+SIZE);
+					int y=(int)(t.getY()-SEP)/(int)(SEP+SIZE);
+					if(Grid[x][y-1]==0){
+						t.setY((int)(t.getY()-SIZE-SEP));
+						Grid[x][y-1]=Grid[x][y];
+						Grid[x][y]=0;
+						addRandom(1);
+					}
+					else if(Grid[x][y-1]==Grid[x][y]){
+						int n=tiles.indexOf(new Tile(t.getX(),t.getY()-(int)(SIZE+SEP),t.getValue()));
+						Tile t1 = tiles.get(n);
+						t1.augmentValue(t.getValue());
+						gui.remove(t.tile);
+						Grid[x][y]=0;
+						addRandom(1);
+					}
+				}
+			}
+		}
+		else if (keyCode == 39) // right
+		{
+			System.out.println("right");
+			// insert method here
+		}
+		else if (keyCode == 40) // down
+		{
+			System.out.println("down");
+			// insert method here
+		}
+		
 	}
 
 	public void keyReleased(KeyEvent e) {
 	}
 
 	protected void displayInfo(KeyEvent e, String s) {
-		int keyCode = e.getKeyCode();
-		boolean changed = false;
-		if (keyCode == 37) // left Key
-		{
-			for (int i = 0; i < full.size(); i++) {
-				full.get(i);
-			}
-		} else if (keyCode == 38) // up
-		{
-			// insert method here
-		} else if (keyCode == 39) // right
-		{
-			// insert method here
-		} else if (keyCode == 40) // down
-		{
-			// insert method here
-		}
-		if (changed) {
-			addRandom(1);
-		}
+		
 	}
 }
