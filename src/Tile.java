@@ -6,7 +6,7 @@ import acm.graphics.*;
 /**
      * Constructor for objects of class Tiles
      */
-   public class Tiles
+   public class Tile
 {
     public int x;
     public int y;
@@ -16,7 +16,7 @@ import acm.graphics.*;
     /**
      * Constructor for objects of class Tiles
      */
-    public Tiles(int x, int y, int value)
+    public Tile(int x, int y, int value)
     {
         this.x = x;
         this.y = y;
