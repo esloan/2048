@@ -30,6 +30,9 @@ public class GUI extends GraphicsProgram {
                 gui.add(grid[i][j],SEP+(SIZE+SEP)*i,SEP+(SIZE+SEP)*j);
             }
         }
+        
+        addRandom(2);
+        
     }
     /**
        * This method runs the animation.
