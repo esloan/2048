@@ -11,7 +11,10 @@ import acm.graphics.*;
     public int x;
     public int y;
     public int value;
-    Color tcolor=new Color(240, 240, 15);
+    Color [] colors ={new Color(255, 51, 51),new Color(255,153,51),
+    		new Color(255,255,51),new Color(51,255,51),new Color(51,255,153),
+    		new Color(51,255,255),new Color(51,153,255),new Color(51,51,255),new Color(153,51,255),new Color(255,51,153)};
+    //Color tcolor=new Color(240, 240, 15);
     public GRoundRect tile;
     /**
      * Constructor for objects of class Tiles
@@ -23,7 +26,7 @@ import acm.graphics.*;
         this.value = value;
         tile=new GRoundRect((double)x,(double)y,80,80);
         tile.setFilled(true);
-        tile.setColor(tcolor);
+        tile.setColor(colors[0]);
     }
 
     public int getX() {
@@ -48,9 +51,14 @@ import acm.graphics.*;
 
     public void setValue(int value) {
         this.value = value;
+        tile.setColor(colors[(int)(Math.log(value)/Math.log(2))]);
+        System.out.println(value);
     }
     public void augmentValue(int value){
         this.value = value*2;
+        tile.setColor(colors[(int)(Math.log(value)/Math.log(2))]);
+        System.out.println(value);
+        System.out.println((int)(Math.log(value)/Math.log(2)));
     }
     
 }
