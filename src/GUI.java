@@ -1,15 +1,13 @@
-import java.applet.Applet;
 import java.awt.*;
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Image;
 import java.util.ArrayList;
+
 import acm.graphics.*;
 import acm.program.GraphicsProgram;
+
 import java.util.Random;
 import java.awt.event.*;
 
-public class GUI extends GraphicsProgram {
+public class GUI extends GraphicsProgram implements KeyListener{
 	private static final int ROWS = 4; // number of rows in the background
 	private static final int COLUMNS = 4; // number of columns in the background
 	private static final double SIZE = 80; // size of each brick (pixels, width
@@ -17,10 +15,9 @@ public class GUI extends GraphicsProgram {
 	private static final int SEP = 10; // separator size (pixels)
 	private static final double WIDTH = COLUMNS * (SIZE + SEP) + SEP;
 	private static final double HEIGHT = ROWS * (SIZE + SEP) + SEP;
-	static GUI gui = new GUI();
 	private int[][] Grid = new int[ROWS][COLUMNS];
 	ArrayList<Point> available = new ArrayList<Point>();
-	ArrayList<Point> full = new ArrayList<Point>();
+	ArrayList<Tile> tiles = new ArrayList<Tile>();
 
 	public void init() {
 		// setBackground(Color.blue);//sets background color
@@ -31,23 +28,38 @@ public class GUI extends GraphicsProgram {
 				grid[i][j] = new GRoundRect(SIZE, SIZE);
 				grid[i][j].setFilled(true);
 				grid[i][j].setFillColor(Color.MAGENTA);
-				gui.add(grid[i][j], SEP + (SIZE + SEP) * i, SEP + (SIZE + SEP)* j);
+				add(grid[i][j], SEP + (SIZE + SEP) * i, SEP + (SIZE + SEP)* j);
 			}
 		}
 
-		gui.addKeyListener(this);
+		addKeyListeners();
 
 		for (int i = 0; i < Grid.length; i++) {
 			for (int m = 0; m < Grid.length; m++) {
-				if (Grid[i][m] == 0) {
+				if (Grid[i][m] == 0&&i==1) {
 					available.add(new Point(i,m));
-				} else {
-					full.add(new Point(i,m));
 				}
 			}
 		}
 
 		addRandom(2);
+//		try {
+//			Thread.sleep(1000);
+//		} catch (InterruptedException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//
+//		up();
+
+		//		try {
+		//			Thread.sleep(1000);
+		//		} catch (InterruptedException e) {
+		//			// TODO Auto-generated catch block
+		//			e.printStackTrace();
+		//		}
+		//
+		//		down();
 
 	}
 
@@ -56,9 +68,9 @@ public class GUI extends GraphicsProgram {
 	 */
 	public void run() {
 		String[] sizeArgs = { "width=" + (int) WIDTH, "height=" + (int) HEIGHT };
-		if (!gui.isStarted()) {
-			gui.start(sizeArgs);
-		}
+			start(sizeArgs);
+
+
 	}
 
 	/**
@@ -76,7 +88,8 @@ public class GUI extends GraphicsProgram {
 			Grid[(int) p.getX()][(int) p.getY()] = r.nextInt(4) == 1 ? 4 : 2;
 			Tile t = new Tile((int)( p.getX()*(SIZE + SEP)+SEP), (int) (p.getY()*(SIZE + SEP)+SEP),
 					r.nextInt(4) == 1 ? 4 : 2);
-			gui.add(t.tile);
+			add(t.tile);
+			tiles.add(t);
 			available.remove(p);
 		}
 	}
@@ -87,35 +100,114 @@ public class GUI extends GraphicsProgram {
 	}
 
 	public void keyTyped(KeyEvent e) {
+		
 	}
 
 	public void keyPressed(KeyEvent e) {
-		displayInfo(e, "KEY PRESSED: ");
+		displayInfo(e,"KEYPRESSED:");
 	}
+
+	public void up(){
+		/*boolean changed = false;
+		int n = tiles.size();
+		for (int i = 0; i < n; i++) {
+			Tile t = tiles.get(i);
+			System.out.println("Tile at "+t.getX()+","+t.getY());
+			if(t.getY()>10){
+				int x=(int)(t.getX()-SEP)/(int)(SEP+SIZE);
+				int y=(int)(t.getY()-SEP)/(int)(SEP+SIZE);
+				while(y>0){
+					if(Grid[x][y-1]==0){
+						remove(t.tile);
+						t.setY((int)(t.getY()-SIZE-SEP));
+						add(t.tile,t.getX(),t.getY());
+						Grid[x][y-1]=Grid[x][y];
+						Grid[x][y]=0;
+						changed=true;
+						y--;
+					}
+					else if(Grid[x][y-1]==Grid[x][y]){
+						Tile t1 = null;
+						for(Tile t2:tiles){
+							if(t2.getX()==t.getX()&&t2.getY()==t.getY()){
+								t1=t2;
+							}
+						}
+						t1.augmentValue(t.getValue());
+						remove(t.tile);
+						Grid[x][y]=0;
+						Grid[x][y-1]*=2;
+						changed=true;
+						y--;
+					}
+
+				}
+			}
+		}
+		//if(changed){addRandom(1);}*/
+	}
+	public void down(){
+//		boolean changed = false;
+//		int n = tiles.size();
+//		for (int i = 0; i < n; i++) {
+//			Tile t = tiles.get(i);
+//			if(t.getY()<HEIGHT-SIZE-2*SEP){
+//				int x=(int)(t.getX()-SEP)/(int)(SEP+SIZE);
+//				int y=(int)(t.getY()-SEP)/(int)(SEP+SIZE);
+//				if(Grid[x][y+1]==0){
+//					remove(t.tile);
+//					t.setY((int)(t.getY()+SIZE+SEP));
+//					add(t.tile,t.getX(),t.getY());
+//					Grid[x][y+1]=Grid[x][y];
+//					Grid[x][y]=0;
+//					changed=true;
+//				}
+//				else if(Grid[x][y+1]==Grid[x][y]){
+//					Tile t1 = null;
+//					for(Tile t2:tiles){
+//						if(t2.getX()==t.getX()&&t2.getY()==t.getY()){
+//							t1=t2;
+//						}
+//					}
+//					t1.augmentValue(t.getValue());
+//					remove(t.tile);
+//					Grid[x][y]=0;
+//					Grid[x][y+1]*=2;
+//					changed=true;
+//				}
+//			}
+//		}
+//		if(changed){addRandom(1);}
+	}
+
 
 	public void keyReleased(KeyEvent e) {
 	}
 
 	protected void displayInfo(KeyEvent e, String s) {
 		int keyCode = e.getKeyCode();
-		boolean changed = false;
 		if (keyCode == 37) // left Key
 		{
-			for (int i = 0; i < full.size(); i++) {
-				full.get(i);
-			}
-		} else if (keyCode == 38) // up
+			System.out.println("left");
+
+		}
+		else if (keyCode == 38) // up
 		{
-			// insert method here
-		} else if (keyCode == 39) // right
+			System.out.println("up");
+			up();
+
+		}
+		else if (keyCode == 39) // right
 		{
-			// insert method here
-		} else if (keyCode == 40) // down
-		{
+			System.out.println("right");
 			// insert method here
 		}
-		if (changed) {
-			addRandom(1);
+		else if (keyCode == 40) // down
+		{
+			System.out.println("down");
+			down();
 		}
+
+
 	}
 }
