@@ -36,31 +36,11 @@ public class GUI extends GraphicsProgram implements KeyListener{
 
 		for (int i = 0; i < Grid.length; i++) {
 			for (int m = 0; m < Grid.length; m++) {
-				if (Grid[i][m] == 0&&i==1) {
-					available.add(new Point(i,m));
-				}
+				available.add(new Point(i,m));
 			}
 		}
 
 		addRandom(2);
-//		try {
-//			Thread.sleep(1000);
-//		} catch (InterruptedException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//
-//		up();
-
-		//		try {
-		//			Thread.sleep(1000);
-		//		} catch (InterruptedException e) {
-		//			// TODO Auto-generated catch block
-		//			e.printStackTrace();
-		//		}
-		//
-		//		down();
-
 	}
 
 	/**
@@ -68,8 +48,8 @@ public class GUI extends GraphicsProgram implements KeyListener{
 	 */
 	public void run() {
 		String[] sizeArgs = { "width=" + (int) WIDTH, "height=" + (int) HEIGHT };
-			start(sizeArgs);
-
+		if(!isStarted()){
+			start(sizeArgs);}
 
 	}
 
@@ -100,7 +80,7 @@ public class GUI extends GraphicsProgram implements KeyListener{
 	}
 
 	public void keyTyped(KeyEvent e) {
-		
+
 	}
 
 	public void keyPressed(KeyEvent e) {
@@ -108,77 +88,169 @@ public class GUI extends GraphicsProgram implements KeyListener{
 	}
 
 	public void up(){
-		/*boolean changed = false;
+		boolean changed = false;
+		//add some way to keep track of and remove the invisible tiles
+		Tile[] toRemove = new Tile[tiles.size()];
 		int n = tiles.size();
 		for (int i = 0; i < n; i++) {
 			Tile t = tiles.get(i);
-			System.out.println("Tile at "+t.getX()+","+t.getY());
+			//System.out.println("Tile at "+t.getX()+","+t.getY());
 			if(t.getY()>10){
 				int x=(int)(t.getX()-SEP)/(int)(SEP+SIZE);
 				int y=(int)(t.getY()-SEP)/(int)(SEP+SIZE);
-				while(y>0){
-					if(Grid[x][y-1]==0){
-						remove(t.tile);
-						t.setY((int)(t.getY()-SIZE-SEP));
-						add(t.tile,t.getX(),t.getY());
-						Grid[x][y-1]=Grid[x][y];
-						Grid[x][y]=0;
-						changed=true;
-						y--;
-					}
-					else if(Grid[x][y-1]==Grid[x][y]){
-						Tile t1 = null;
-						for(Tile t2:tiles){
-							if(t2.getX()==t.getX()&&t2.getY()==t.getY()){
-								t1=t2;
-							}
+				if(Grid[x][y-1]==0){
+					remove(t.tile);
+					t.setY((int)(t.getY()-SIZE-SEP));
+					add(t.tile,t.getX(),t.getY());
+					Grid[x][y-1]=Grid[x][y];
+					Grid[x][y]=0;
+					changed=true;
+					y--;
+				}
+				else if(Grid[x][y-1]==Grid[x][y]){
+					Tile t1 = null;
+					for(Tile t2:tiles){
+						if(t2.getX()==t.getX()&&t2.getY()==t.getY()){
+							t1=t2;
 						}
-						t1.augmentValue(t.getValue());
-						remove(t.tile);
-						Grid[x][y]=0;
-						Grid[x][y-1]*=2;
-						changed=true;
-						y--;
 					}
-
+					t1.augmentValue(t.getValue());
+					System.out.println("Combined tile at "+t.getX()+","+t.getY());
+					remove(t.tile);
+					toRemove[i]=tiles.get(i);
+					Grid[x][y]=0;
+					Grid[x][y-1]*=2;
+					changed=true;
+					y--;
 				}
 			}
 		}
-		//if(changed){addRandom(1);}*/
+		for(int m=0;m<toRemove.length;m++){
+			if(toRemove[m]!=null){tiles.remove(toRemove[m]);}
+		}
+		if(changed){addRandom(1);}
 	}
 	public void down(){
-//		boolean changed = false;
-//		int n = tiles.size();
-//		for (int i = 0; i < n; i++) {
-//			Tile t = tiles.get(i);
-//			if(t.getY()<HEIGHT-SIZE-2*SEP){
-//				int x=(int)(t.getX()-SEP)/(int)(SEP+SIZE);
-//				int y=(int)(t.getY()-SEP)/(int)(SEP+SIZE);
-//				if(Grid[x][y+1]==0){
-//					remove(t.tile);
-//					t.setY((int)(t.getY()+SIZE+SEP));
-//					add(t.tile,t.getX(),t.getY());
-//					Grid[x][y+1]=Grid[x][y];
-//					Grid[x][y]=0;
-//					changed=true;
-//				}
-//				else if(Grid[x][y+1]==Grid[x][y]){
-//					Tile t1 = null;
-//					for(Tile t2:tiles){
-//						if(t2.getX()==t.getX()&&t2.getY()==t.getY()){
-//							t1=t2;
-//						}
-//					}
-//					t1.augmentValue(t.getValue());
-//					remove(t.tile);
-//					Grid[x][y]=0;
-//					Grid[x][y+1]*=2;
-//					changed=true;
-//				}
-//			}
-//		}
-//		if(changed){addRandom(1);}
+		boolean changed = false;
+		Tile[] toRemove = new Tile[tiles.size()];
+		int n = tiles.size();
+		for (int i = 0; i < n; i++) {
+			Tile t = tiles.get(i);
+			if(t.getY()<HEIGHT-SIZE-2*SEP){
+				int x=(int)(t.getX()-SEP)/(int)(SEP+SIZE);
+				int y=(int)(t.getY()-SEP)/(int)(SEP+SIZE);
+				if(Grid[x][y+1]==0){
+					remove(t.tile);
+					t.setY((int)(t.getY()+SIZE+SEP));
+					add(t.tile,t.getX(),t.getY());
+					Grid[x][y+1]=Grid[x][y];
+					Grid[x][y]=0;
+					changed=true;
+				}
+				else if(Grid[x][y+1]==Grid[x][y]){
+					Tile t1 = null;
+					for(Tile t2:tiles){
+						if(t2.getX()==t.getX()&&t2.getY()==t.getY()){
+							t1=t2;
+						}
+					}
+					t1.augmentValue(t.getValue());
+					System.out.println("Combined tile at "+t.getX()+","+t.getY());
+					remove(t.tile);
+					toRemove[i]=tiles.get(i);
+					Grid[x][y]=0;
+					Grid[x][y+1]*=2;
+					changed=true;
+				}
+			}
+		}
+		for(int m=0;m<toRemove.length;m++){
+			if(toRemove[m]!=null){tiles.remove(toRemove[m]);}
+		}
+		if(changed){addRandom(1);}
 	}
+
+	public void left(){
+		boolean changed = false;
+		Tile[] toRemove = new Tile[tiles.size()];
+		int n = tiles.size();
+		for (int i = 0; i < n; i++) {
+			Tile t = tiles.get(i);
+			if(t.getX()>SEP){
+				int x=(int)(t.getX()-SEP)/(int)(SEP+SIZE);
+				int y=(int)(t.getY()-SEP)/(int)(SEP+SIZE);
+				if(Grid[x-1][y]==0){
+					remove(t.tile);
+					t.setX((int)(t.getX()-SIZE-SEP));
+					add(t.tile,t.getX(),t.getY());
+					Grid[x-1][y]=Grid[x][y];
+					Grid[x][y]=0;
+					changed=true;
+				}
+				else if(Grid[x-1][y]==Grid[x][y]){
+					Tile t1 = null;
+					for(Tile t2:tiles){
+						if(t2.getX()==t.getX()&&t2.getY()==t.getY()){
+							t1=t2;
+						}
+					}
+					t1.augmentValue(t.getValue());
+					System.out.println("Combined tile at "+t.getX()+","+t.getY());
+					remove(t.tile);
+					toRemove[i]=tiles.get(i);
+					Grid[x][y]=0;
+					Grid[x-1][y]*=2;
+					changed=true;
+				}
+			}
+		}
+		for(int m=0;m<toRemove.length;m++){
+			if(toRemove[m]!=null){tiles.remove(toRemove[m]);}
+		}
+		if(changed){addRandom(1);}
+	}
+
+	public void right(){
+		boolean changed = false;
+		Tile[] toRemove = new Tile[tiles.size()];
+
+		int n = tiles.size();
+		for (int i = 0; i < n; i++) {
+			Tile t = tiles.get(i);
+			if(t.getX()<WIDTH-SIZE-2*SEP){
+				int x=(int)(t.getX()-SEP)/(int)(SEP+SIZE);
+				int y=(int)(t.getY()-SEP)/(int)(SEP+SIZE);
+				if(Grid[x+1][y]==0){
+					remove(t.tile);
+					t.setX((int)(t.getX()+SIZE+SEP));
+					add(t.tile,t.getX(),t.getY());
+					Grid[x+1][y]=Grid[x][y];
+					Grid[x][y]=0;
+					changed=true;
+				}
+				else if(Grid[x+1][y]==Grid[x][y]){
+					Tile t1 = null;
+					for(Tile t2:tiles){
+						if(t2.getX()==t.getX()&&t2.getY()==t.getY()){
+							t1=t2;
+						}
+					}
+					t1.augmentValue(t.getValue());
+					System.out.println("Combined tile at "+t.getX()+","+t.getY());
+					remove(t.tile);
+					toRemove[i]=tiles.get(i);
+					Grid[x][y]=0;
+					Grid[x+1][y]*=2;
+					changed=true;
+				}
+			}
+		}
+		for(int m=0;m<toRemove.length;m++){
+			if(toRemove[m]!=null){tiles.remove(toRemove[m]);}
+		}
+		if(changed){addRandom(1);}
+	}
+
 
 
 	public void keyReleased(KeyEvent e) {
@@ -188,23 +260,24 @@ public class GUI extends GraphicsProgram implements KeyListener{
 		int keyCode = e.getKeyCode();
 		if (keyCode == 37) // left Key
 		{
-			System.out.println("left");
+			//System.out.println("left");
+			left();
 
 		}
 		else if (keyCode == 38) // up
 		{
-			System.out.println("up");
+			//System.out.println("up");
 			up();
 
 		}
 		else if (keyCode == 39) // right
 		{
-			System.out.println("right");
-			// insert method here
+			//System.out.println("right");
+			right();
 		}
 		else if (keyCode == 40) // down
 		{
-			System.out.println("down");
+			//System.out.println("down");
 			down();
 		}
 

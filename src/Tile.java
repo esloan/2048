@@ -26,7 +26,9 @@ import acm.graphics.*;
         this.value = value;
         tile=new GRoundRect((double)x,(double)y,80,80);
         tile.setFilled(true);
-        tile.setColor(colors[0]);
+        int c = (int)(Math.log(value)/Math.log(2)) -1;
+        if (c > 10) { c = c%10;}
+        tile.setColor(colors[c]);
     }
 
     public int getX() {
@@ -51,12 +53,20 @@ import acm.graphics.*;
 
     public void setValue(int value) {
         this.value = value;
-        tile.setColor(colors[(int)(Math.log(value)/Math.log(2))]);
+        int c = (int)(Math.log(value)/Math.log(2)) -1;
+        if (c > 10) { c = c%10;}
+        tile.setColor(colors[c]);
         System.out.println(value);
     }
     public void augmentValue(int value){
+        
+        int c;
+        c = (int)(Math.log(value)/Math.log(2)) -1;
+        if (c > 10) { c = c%10;}
+        
         this.value = value*2;
-        tile.setColor(colors[(int)(Math.log(value)/Math.log(2))]);
+       
+        tile.setColor(colors[c]);
         System.out.println(value);
         System.out.println((int)(Math.log(value)/Math.log(2)));
     }
