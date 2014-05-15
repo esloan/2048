@@ -293,7 +293,7 @@ public class GUI extends GraphicsProgram implements KeyListener{
 				if(Grid[i][j]!=null){
 					Grid[i][j].tile.sendToFront();
 					add(Grid[i][j].tile,Grid[i][j].getX(),Grid[i][j].getY());
-					add(Grid[i][j].l,Grid[i][j].getX()+40,Grid[i][j].getY()+40);
+					add(Grid[i][j].l,Grid[i][j].getX()+25-10*(int)(Math.log10(Grid[i][j].value)),Grid[i][j].getY()+50);
 					Grid[i][j].l.sendToFront();
 					System.out.print((Grid[i][j].getValue())+" ");}
 				else{System.out.print("0 ");}
