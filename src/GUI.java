@@ -72,12 +72,12 @@ public class GUI extends GraphicsProgram implements KeyListener{
 			tiles.add(t);
 			available.remove(p);
 		}
-		
+
 		for(int i=0;i<Grid.length;i++){
 			for(int j=0;j<Grid[0].length;j++){
 				System.out.print(Grid[i][j]);}
 			System.out.println();
-			}
+		}
 	}
 
 	private Color getTileColor(Tile t) {
@@ -96,9 +96,7 @@ public class GUI extends GraphicsProgram implements KeyListener{
 	public void up(){
 		boolean changed = false;
 		//add some way to keep track of and remove the invisible tiles
-		Tile[] toRemove = new Tile[tiles.size()];
-		int n = tiles.size();
-		for (int i = 0; i < n; i++) {
+		for (int i = 0; i < tiles.size(); i++) {
 			Tile t = tiles.get(i);
 			//System.out.println("Tile at "+t.getX()+","+t.getY());
 			if(t.getY()>10){
@@ -115,7 +113,7 @@ public class GUI extends GraphicsProgram implements KeyListener{
 					available.add(new Point(x,y));
 					available.remove(new Point(x,y-1));
 					System.out.println();
-					
+
 					changed=true;
 					y--;
 				}
@@ -133,11 +131,11 @@ public class GUI extends GraphicsProgram implements KeyListener{
 					remove(t1.tile);
 					remove(t.tile);
 					remove(t.l);
-					
+
 					add(t.tile,t.getX(),t.getY());
 					add(t.l,t.getX()+40,t.getY()+40);
 
-					toRemove[i]=t1;
+					tiles.remove(t1);
 					Grid[y][x]=0;
 					Grid[y-1][x]*=2;
 					available.add(new Point(x,y));
@@ -148,16 +146,12 @@ public class GUI extends GraphicsProgram implements KeyListener{
 			}
 			t.tile.setColor(t.colors[(int)(Math.log(t.value)/Math.log(2)) -1]);
 		}
-		for(int m=0;m<toRemove.length;m++){
-			if(toRemove[m]!=null){tiles.remove(toRemove[m]);}
-		}
+		
 		if(changed){addRandom(1);}
 	}
 	public void down(){
 		boolean changed = false;
-		Tile[] toRemove = new Tile[tiles.size()];
-		int n = tiles.size();
-		for (int i = 0; i < n; i++) {
+		for (int i = 0; i < tiles.size(); i++) {
 			Tile t = tiles.get(i);
 			if(t.getY()<HEIGHT-SIZE-2*SEP){
 				int x=(int)(t.getX()-SEP)/(int)(SEP+SIZE);
@@ -189,10 +183,10 @@ public class GUI extends GraphicsProgram implements KeyListener{
 					remove(t1.tile);
 					remove(t.tile);
 					remove(t.l);
-					
+
 					add(t.tile,t.getX(),t.getY());
 					add(t.l,t.getX()+40,t.getY()+40);
-					toRemove[i]=t1;
+					tiles.remove(t1);
 					Grid[y][x]=0;
 					Grid[y+1][x]*=2;
 					available.add(new Point(x,y));
@@ -202,17 +196,13 @@ public class GUI extends GraphicsProgram implements KeyListener{
 			}
 			t.tile.setColor(t.colors[(int)(Math.log(t.value)/Math.log(2)) -1]);
 		}
-		for(int m=0;m<toRemove.length;m++){
-			if(toRemove[m]!=null){tiles.remove(toRemove[m]);}
-		}
+		
 		if(changed){addRandom(1);}
 	}
 
 	public void left(){
 		boolean changed = false;
-		Tile[] toRemove = new Tile[tiles.size()];
-		int n = tiles.size();
-		for (int i = 0; i < n; i++) {
+		for (int i = 0; i < tiles.size(); i++) {
 			Tile t = tiles.get(i);
 			if(t.getX()>SEP){
 				int x=(int)(t.getX()-SEP)/(int)(SEP+SIZE);
@@ -244,10 +234,10 @@ public class GUI extends GraphicsProgram implements KeyListener{
 					remove(t1.tile);
 					remove(t.tile);
 					remove(t.l);
-					
+
 					add(t.tile,t.getX(),t.getY());
 					add(t.l,t.getX()+40,t.getY()+40);
-					toRemove[i]=t1;
+					tiles.remove(t1);
 					Grid[y][x]=0;
 					Grid[y][x-1]*=2;
 					changed=true;
@@ -257,18 +247,14 @@ public class GUI extends GraphicsProgram implements KeyListener{
 			}
 			t.tile.setColor(t.colors[(int)(Math.log(t.value)/Math.log(2)) -1]);
 		}
-		for(int m=0;m<toRemove.length;m++){
-			if(toRemove[m]!=null){tiles.remove(toRemove[m]);}
-		}
+
 		if(changed){addRandom(1);}
 	}
 
 	public void right(){
 		boolean changed = false;
-		Tile[] toRemove = new Tile[tiles.size()];
 
-		int n = tiles.size();
-		for (int i = 0; i < n; i++) {
+		for (int i = 0; i < tiles.size(); i++) {
 			Tile t = tiles.get(i);
 			if(t.getX()<WIDTH-SIZE-2*SEP){
 				int x=(int)(t.getX()-SEP)/(int)(SEP+SIZE);
@@ -299,10 +285,10 @@ public class GUI extends GraphicsProgram implements KeyListener{
 					remove(t1.tile);
 					remove(t.tile);
 					remove(t.l);
-					
+
 					add(t.tile,t.getX(),t.getY());
 					add(t.l,t.getX()+40,t.getY()+40);
-					toRemove[i]=t1;
+					tiles.remove(t1);
 					Grid[y][x]=0;
 					Grid[y][x+1]*=2;
 					available.add(new Point(x,y));
@@ -313,9 +299,7 @@ public class GUI extends GraphicsProgram implements KeyListener{
 			t.tile.setColor(t.colors[(int)(Math.log(t.value)/Math.log(2)) -1]);
 			System.out.println((int)(Math.log(t.value)/Math.log(2))-1);
 		}
-		for(int m=0;m<toRemove.length;m++){
-			if(toRemove[m]!=null){tiles.remove(toRemove[m]);}
-		}
+		
 		if(changed){addRandom(1);}
 	}
 
@@ -351,9 +335,9 @@ public class GUI extends GraphicsProgram implements KeyListener{
 		System.out.println();
 		for(int i=0;i<Grid.length;i++){
 			for(int j=0;j<Grid[0].length;j++){
-				System.out.print(Grid[i][j]);}
+				System.out.print(Grid[i][j]+" ");}
 			System.out.println();
-			}
+		}
 
 	}
 }
