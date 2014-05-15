@@ -1,6 +1,8 @@
 
 import java.awt.Color; 
+import java.awt.Font;
 import java.util.Random;
+
 import acm.program.*;
 import acm.graphics.*;
 /**
@@ -35,7 +37,9 @@ public class Tile
 		c = (int)(Math.log(value)/Math.log(2)) -1;
 		if (c > 10) { c = c%10;}
 		tile.setColor(colors[(int)(Math.log(value)/Math.log(2)) -1]);
-		l=new GLabel(String.valueOf(value),x+40,y+40);
+		l=new GLabel(String.valueOf(value),x+30,y+50);
+		l.setFont(new Font("Dialog",0,40));
+		l.setColor(Color.WHITE);
 		l.sendToFront();
 	}
 
@@ -83,6 +87,9 @@ public class Tile
 		value = value*2;
 
 		tile.setColor(colors[c]);
+		if(value>1000){
+			l.setFont(new Font("Dialog",0,30));
+		}
 		System.out.println(value);
 		l.setLabel(String.valueOf(value));
 	}
