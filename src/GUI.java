@@ -60,18 +60,24 @@ public class GUI extends GraphicsProgram implements KeyListener{
 
 		Random r = new Random();
 		if (available.isEmpty()) {
-			System.out.println("Game Over");
 			return;
 		}
 		for (int i = 0; i < n; i++) {
 			Point p = available.get(r.nextInt(available.size()));
-			Grid[(int) p.getX()][(int) p.getY()] = r.nextInt(4) == 1 ? 4 : 2;
-			Tile t = new Tile((int)( p.getX()*(SIZE + SEP)+SEP), (int) (p.getY()*(SIZE + SEP)+SEP),
-					r.nextInt(4) == 1 ? 4 : 2);
+			Grid[(int) p.getY()][(int) p.getX()] = r.nextInt(4) == 1 ? 4 : 2;
+			Tile t = new Tile((int) (p.getX()*(SIZE + SEP)+SEP), (int) (p.getY()*(SIZE + SEP)+SEP),
+					Grid[(int) p.getY()][(int) p.getX()]);
 			add(t.tile);
+			add(t.l);
 			tiles.add(t);
 			available.remove(p);
 		}
+		
+		for(int i=0;i<Grid.length;i++){
+			for(int j=0;j<Grid[0].length;j++){
+				System.out.print(Grid[i][j]);}
+			System.out.println();
+			}
 	}
 
 	private Color getTileColor(Tile t) {
@@ -98,32 +104,49 @@ public class GUI extends GraphicsProgram implements KeyListener{
 			if(t.getY()>10){
 				int x=(int)(t.getX()-SEP)/(int)(SEP+SIZE);
 				int y=(int)(t.getY()-SEP)/(int)(SEP+SIZE);
-				if(Grid[x][y-1]==0){
+				if(Grid[y-1][x]==0){
 					remove(t.tile);
 					t.setY((int)(t.getY()-SIZE-SEP));
 					add(t.tile,t.getX(),t.getY());
-					Grid[x][y-1]=Grid[x][y];
-					Grid[x][y]=0;
+					remove(t.l);
+					add(t.l,t.getX()+40,t.getY()+40);
+					Grid[y-1][x]=Grid[y][x];
+					Grid[y][x]=0;
+					available.add(new Point(x,y));
+					available.remove(new Point(x,y-1));
+					System.out.println();
+					
 					changed=true;
 					y--;
 				}
-				else if(Grid[x][y-1]==Grid[x][y]){
+				else if(Grid[y-1][x]==Grid[y][x]){
+					t.setY((int)(t.getY()-SIZE-SEP));
 					Tile t1 = null;
 					for(Tile t2:tiles){
-						if(t2.getX()==t.getX()&&t2.getY()==t.getY()){
+						if(t2.getGridX()==x&&t2.getGridY()==y-1){
 							t1=t2;
 						}
 					}
-					t1.augmentValue(t.getValue());
-					System.out.println("Combined tile at "+t.getX()+","+t.getY());
+					System.out.println("Combined tiles to "+t1.getX()+","+t1.getY());
+					t.setValue(t.getValue()*2);
+					remove(t1.l);
+					remove(t1.tile);
 					remove(t.tile);
-					toRemove[i]=tiles.get(i);
-					Grid[x][y]=0;
-					Grid[x][y-1]*=2;
+					remove(t.l);
+					
+					add(t.tile,t.getX(),t.getY());
+					add(t.l,t.getX()+40,t.getY()+40);
+
+					toRemove[i]=t1;
+					Grid[y][x]=0;
+					Grid[y-1][x]*=2;
+					available.add(new Point(x,y));
+					available.remove(new Point(x,y-1));
 					changed=true;
 					y--;
 				}
 			}
+			t.tile.setColor(t.colors[(int)(Math.log(t.value)/Math.log(2)) -1]);
 		}
 		for(int m=0;m<toRemove.length;m++){
 			if(toRemove[m]!=null){tiles.remove(toRemove[m]);}
@@ -139,30 +162,45 @@ public class GUI extends GraphicsProgram implements KeyListener{
 			if(t.getY()<HEIGHT-SIZE-2*SEP){
 				int x=(int)(t.getX()-SEP)/(int)(SEP+SIZE);
 				int y=(int)(t.getY()-SEP)/(int)(SEP+SIZE);
-				if(Grid[x][y+1]==0){
+				if(Grid[y+1][x]==0){
 					remove(t.tile);
 					t.setY((int)(t.getY()+SIZE+SEP));
+					remove(t.l);
 					add(t.tile,t.getX(),t.getY());
-					Grid[x][y+1]=Grid[x][y];
-					Grid[x][y]=0;
+					add(t.l,t.getX()+40,t.getY()+40);
+					System.out.println("Down \n");
+					Grid[y+1][x]=Grid[y][x];
+					Grid[y][x]=0;
+					available.add(new Point(x,y));
+					available.remove(new Point(x,y+1));
 					changed=true;
 				}
-				else if(Grid[x][y+1]==Grid[x][y]){
+				else if(Grid[y+1][x]==Grid[y][x]){
+					t.setY((int)(t.getY()+SIZE+SEP));
 					Tile t1 = null;
 					for(Tile t2:tiles){
-						if(t2.getX()==t.getX()&&t2.getY()==t.getY()){
+						if(t2.getGridX()==x&&t2.getGridY()==y+1){
 							t1=t2;
 						}
 					}
-					t1.augmentValue(t.getValue());
-					System.out.println("Combined tile at "+t.getX()+","+t.getY());
+					System.out.println("Combined tiles to "+t1.getX()+","+t1.getY());
+					t.setValue(t.getValue()*2);
+					remove(t1.l);
+					remove(t1.tile);
 					remove(t.tile);
-					toRemove[i]=tiles.get(i);
-					Grid[x][y]=0;
-					Grid[x][y+1]*=2;
+					remove(t.l);
+					
+					add(t.tile,t.getX(),t.getY());
+					add(t.l,t.getX()+40,t.getY()+40);
+					toRemove[i]=t1;
+					Grid[y][x]=0;
+					Grid[y+1][x]*=2;
+					available.add(new Point(x,y));
+					available.remove(new Point(x,y+1));
 					changed=true;
 				}
 			}
+			t.tile.setColor(t.colors[(int)(Math.log(t.value)/Math.log(2)) -1]);
 		}
 		for(int m=0;m<toRemove.length;m++){
 			if(toRemove[m]!=null){tiles.remove(toRemove[m]);}
@@ -179,30 +217,45 @@ public class GUI extends GraphicsProgram implements KeyListener{
 			if(t.getX()>SEP){
 				int x=(int)(t.getX()-SEP)/(int)(SEP+SIZE);
 				int y=(int)(t.getY()-SEP)/(int)(SEP+SIZE);
-				if(Grid[x-1][y]==0){
+				if(Grid[y][x-1]==0){
 					remove(t.tile);
+					remove(t.l);
 					t.setX((int)(t.getX()-SIZE-SEP));
 					add(t.tile,t.getX(),t.getY());
-					Grid[x-1][y]=Grid[x][y];
-					Grid[x][y]=0;
+					add(t.l,t.getX()+40,t.getY()+40);
+					Grid[y][x-1]=Grid[y][x];
+					Grid[y][x]=0;
+					available.add(new Point(x,y));
+					available.remove(new Point(x-1,y));
 					changed=true;
 				}
-				else if(Grid[x-1][y]==Grid[x][y]){
+				else if(Grid[y][x-1]==Grid[y][x]){
 					Tile t1 = null;
+					t.setX((int)(t.getX()-SIZE-SEP));
+
 					for(Tile t2:tiles){
-						if(t2.getX()==t.getX()&&t2.getY()==t.getY()){
+						if(t2.getGridX()==x-1&&t2.getGridY()==y){
 							t1=t2;
 						}
 					}
-					t1.augmentValue(t.getValue());
-					System.out.println("Combined tile at "+t.getX()+","+t.getY());
+					System.out.println("Combined tiles to "+t1.getX()+","+t1.getY());
+					t.setValue(t.getValue()*2);
+					remove(t1.l);
+					remove(t1.tile);
 					remove(t.tile);
-					toRemove[i]=tiles.get(i);
-					Grid[x][y]=0;
-					Grid[x-1][y]*=2;
+					remove(t.l);
+					
+					add(t.tile,t.getX(),t.getY());
+					add(t.l,t.getX()+40,t.getY()+40);
+					toRemove[i]=t1;
+					Grid[y][x]=0;
+					Grid[y][x-1]*=2;
 					changed=true;
+					available.add(new Point(x,y));
+					available.remove(new Point(x-1,y));
 				}
 			}
+			t.tile.setColor(t.colors[(int)(Math.log(t.value)/Math.log(2)) -1]);
 		}
 		for(int m=0;m<toRemove.length;m++){
 			if(toRemove[m]!=null){tiles.remove(toRemove[m]);}
@@ -220,30 +273,45 @@ public class GUI extends GraphicsProgram implements KeyListener{
 			if(t.getX()<WIDTH-SIZE-2*SEP){
 				int x=(int)(t.getX()-SEP)/(int)(SEP+SIZE);
 				int y=(int)(t.getY()-SEP)/(int)(SEP+SIZE);
-				if(Grid[x+1][y]==0){
+				if(Grid[y][x+1]==0){
 					remove(t.tile);
+					remove(t.l);
 					t.setX((int)(t.getX()+SIZE+SEP));
 					add(t.tile,t.getX(),t.getY());
-					Grid[x+1][y]=Grid[x][y];
-					Grid[x][y]=0;
+					add(t.l,t.getX()+40,t.getY()+40);
+					Grid[y][x+1]=Grid[y][x];
+					Grid[y][x]=0;
+					available.add(new Point(x,y));
+					available.remove(new Point(x+1,y));
 					changed=true;
 				}
-				else if(Grid[x+1][y]==Grid[x][y]){
+				else if(Grid[y][x+1]==Grid[y][x]){
 					Tile t1 = null;
+					t.setX((int)(t.getX()+SIZE+SEP));
 					for(Tile t2:tiles){
-						if(t2.getX()==t.getX()&&t2.getY()==t.getY()){
+						if(t2.getGridX()==x+1&&t2.getGridY()==y){
 							t1=t2;
 						}
 					}
-					t1.augmentValue(t.getValue());
-					System.out.println("Combined tile at "+t.getX()+","+t.getY());
+					System.out.println("Combined tiles to "+t1.getX()+","+t1.getY());
+					t.setValue(t.getValue()*2);
+					remove(t1.l);
+					remove(t1.tile);
 					remove(t.tile);
-					toRemove[i]=tiles.get(i);
-					Grid[x][y]=0;
-					Grid[x+1][y]*=2;
+					remove(t.l);
+					
+					add(t.tile,t.getX(),t.getY());
+					add(t.l,t.getX()+40,t.getY()+40);
+					toRemove[i]=t1;
+					Grid[y][x]=0;
+					Grid[y][x+1]*=2;
+					available.add(new Point(x,y));
+					available.remove(new Point(x+1,y));
 					changed=true;
 				}
 			}
+			t.tile.setColor(t.colors[(int)(Math.log(t.value)/Math.log(2)) -1]);
+			System.out.println((int)(Math.log(t.value)/Math.log(2))-1);
 		}
 		for(int m=0;m<toRemove.length;m++){
 			if(toRemove[m]!=null){tiles.remove(toRemove[m]);}
@@ -280,7 +348,12 @@ public class GUI extends GraphicsProgram implements KeyListener{
 			//System.out.println("down");
 			down();
 		}
-
+		System.out.println();
+		for(int i=0;i<Grid.length;i++){
+			for(int j=0;j<Grid[0].length;j++){
+				System.out.print(Grid[i][j]);}
+			System.out.println();
+			}
 
 	}
 }
