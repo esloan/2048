@@ -15,6 +15,7 @@ public class Tile
 	public int x;
 	public int y;
 	public int value;
+	int c;
 	public GLabel l;
 	Color [] colors ={new Color(255, 51, 51),new Color(255,153,51),
 			new Color(255,255,51),new Color(51,255,51),new Color(51,255,153),
@@ -31,7 +32,7 @@ public class Tile
 		this.value = value;
 		tile=new GRoundRect((double)x,(double)y,80,80);
 		tile.setFilled(true);
-		int c = (int)(Math.log(value)/Math.log(2)) -1;
+		c = (int)(Math.log(value)/Math.log(2)) -1;
 		if (c > 10) { c = c%10;}
 		tile.setColor(colors[(int)(Math.log(value)/Math.log(2)) -1]);
 		l=new GLabel(String.valueOf(value),x+40,y+40);
@@ -70,18 +71,16 @@ public class Tile
 		this.value = value;
 		int c = (int)(Math.log(value)/Math.log(2)) -1;
 		if (c > 10) { c = c%10;}
-		tile.setColor(colors[5]);
+		tile.setColor(colors[c]);
 		l.setLabel(String.valueOf(value));
 
 		System.out.println(c);
 	}
-	public void augmentValue(int value){
+	public void mult(){
 
-		int c;
-		c = (int)(Math.log(value)/Math.log(2)) -1;
-		if (c > 10) { c = c%10;}
+		c++;
 
-		this.value = value*2;
+		value = value*2;
 
 		tile.setColor(colors[c]);
 		System.out.println(value);

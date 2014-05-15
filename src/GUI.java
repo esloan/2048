@@ -15,9 +15,8 @@ public class GUI extends GraphicsProgram implements KeyListener{
 	private static final int SEP = 10; // separator size (pixels)
 	private static final double WIDTH = COLUMNS * (SIZE + SEP) + SEP;
 	private static final double HEIGHT = ROWS * (SIZE + SEP) + SEP;
-	private int[][] Grid = new int[ROWS][COLUMNS];
+	private Tile[][] Grid = new Tile[ROWS][COLUMNS];
 	ArrayList<Point> available = new ArrayList<Point>();
-	ArrayList<Tile> tiles = new ArrayList<Tile>();
 
 	public void init() {
 		// setBackground(Color.blue);//sets background color
@@ -29,6 +28,7 @@ public class GUI extends GraphicsProgram implements KeyListener{
 				grid[i][j].setFilled(true);
 				grid[i][j].setFillColor(Color.MAGENTA);
 				add(grid[i][j], SEP + (SIZE + SEP) * i, SEP + (SIZE + SEP)* j);
+				Grid[i][j]=null;
 			}
 		}
 
@@ -64,25 +64,13 @@ public class GUI extends GraphicsProgram implements KeyListener{
 		}
 		for (int i = 0; i < n; i++) {
 			Point p = available.get(r.nextInt(available.size()));
-			Grid[(int) p.getY()][(int) p.getX()] = r.nextInt(4) == 1 ? 4 : 2;
-			Tile t = new Tile((int) (p.getX()*(SIZE + SEP)+SEP), (int) (p.getY()*(SIZE + SEP)+SEP),
-					Grid[(int) p.getY()][(int) p.getX()]);
-			add(t.tile);
-			add(t.l);
-			tiles.add(t);
+			Grid[(int) p.getY()][(int) p.getX()] = new Tile((int) (p.getX()*(SIZE+SEP)+SEP), (int) (p.getY()*(SIZE + SEP)+SEP),r.nextInt(4)==1?4:2);
+			add(Grid[(int) p.getY()][(int) p.getX()].tile);
+			add(Grid[(int) p.getY()][(int) p.getX()].l);
 			available.remove(p);
 		}
 
-		for(int i=0;i<Grid.length;i++){
-			for(int j=0;j<Grid[0].length;j++){
-				System.out.print(Grid[i][j]);}
-			System.out.println();
-		}
-	}
 
-	private Color getTileColor(Tile t) {
-		Color color = new Color(255, 255 - t.value / 8, 15);
-		return color;
 	}
 
 	public void keyTyped(KeyEvent e) {
@@ -95,106 +83,95 @@ public class GUI extends GraphicsProgram implements KeyListener{
 
 	public void up(){
 		boolean changed = false;
-		//add some way to keep track of and remove the invisible tiles
-		for (int i = 0; i < tiles.size(); i++) {
-			Tile t = tiles.get(i);
-			//System.out.println("Tile at "+t.getX()+","+t.getY());
-			if(t.getY()>10){
-				int x=(int)(t.getX()-SEP)/(int)(SEP+SIZE);
-				int y=(int)(t.getY()-SEP)/(int)(SEP+SIZE);
-				if(Grid[y-1][x]==0){
-					remove(t.tile);
-					t.setY((int)(t.getY()-SIZE-SEP));
-					add(t.tile,t.getX(),t.getY());
-					remove(t.l);
-					add(t.l,t.getX()+40,t.getY()+40);
-					Grid[y-1][x]=Grid[y][x];
-					Grid[y][x]=0;
-					available.add(new Point(x,y));
-					available.remove(new Point(x,y-1));
-					System.out.println();
 
-					changed=true;
-					y--;
-				}
-				else if(Grid[y-1][x]==Grid[y][x]){
-					t.setY((int)(t.getY()-SIZE-SEP));
-					Tile t1 = null;
-					for(Tile t2:tiles){
-						if(t2.getGridX()==x&&t2.getGridY()==y-1){
-							t1=t2;
-						}
+		for(int i = 1; i < ROWS; i++ ) // i is rows
+		{
+			for(int j = 0; j < COLUMNS; j++)
+			{
+				if(Grid[i][j]!=null){				//Checks to see if there is a tile there
+					if(Grid [i-1][j]==null )		//Checks to see if the space above is empty
+					{
+						Grid[i-1][j] = Grid [i][j]; // "Moves" the idea of a tile in the grid
+						remove(Grid[i][j].tile);	// removes old tile from screen
+						remove(Grid[i][j].l);		// removes old label from screen
+						Grid [i][j] = null;			// removes old tile from grid
+						Grid[i-1][j].setY((int) (Grid[i-1][j].getY()-SEP-SIZE));			//  Sets new y value
+						add(Grid[i-1][j].tile,Grid[i-1][j].getX(),Grid[i-1][j].getY());		//  adds new tile to grid
+						add(Grid[i-1][j].l,Grid[i-1][j].getX()+40,Grid[i-1][j].getY()+40);	//  adds new label to grid
+						changed = true;														//  Allows for new tile to be added
 					}
-					System.out.println("Combined tiles to "+t1.getX()+","+t1.getY());
-					t.setValue(t.getValue()*2);
-					remove(t1.l);
-					remove(t1.tile);
-					remove(t.tile);
-					remove(t.l);
+					else if(Grid [i][j].getValue() == Grid [i-1][j].getValue())				// Checks to see if it can merge
+					{
+						remove(Grid[i][j].tile);		//removes old tile
+						remove(Grid[i][j].l);			// removes old label 
+						Grid[i][j] = null;				//remves old tile from grid
+						Grid[i-1][j].mult();			//Changes value + Color
+//						remove(Grid[i-1][j].tile);	
+//						add(Grid[i-1][j].tile);
+//
+//						remove(Grid[i-1][j].l);
+//						add(Grid[i-1][j].l,Grid[i-1][j].getX()+40,Grid[i-1][j].getY()+40);
 
-					add(t.tile,t.getX(),t.getY());
-					add(t.l,t.getX()+40,t.getY()+40);
-
-					tiles.remove(t1);
-					Grid[y][x]=0;
-					Grid[y-1][x]*=2;
-					available.add(new Point(x,y));
-					available.remove(new Point(x,y-1));
-					changed=true;
-					y--;
+						changed = true;					// alows new tile to be added
+					}
 				}
 			}
-			t.tile.setColor(t.colors[(int)(Math.log(t.value)/Math.log(2)) -1]);
+		}
+		available = new ArrayList<Point>();
+		for (int i = 0; i < Grid.length; i++) {
+			for (int m = 0; m < Grid.length; m++) { 
+				if(Grid[i][m]==null){available.add(new Point(i,m));}   // creates list of empty spaces
+			}
 		}
 		
-		if(changed){addRandom(1);}
+		if(changed){addRandom(1);}	// adds new tile
+		
 	}
+
 	public void down(){
 		boolean changed = false;
-		for (int i = 0; i < tiles.size(); i++) {
-			Tile t = tiles.get(i);
-			if(t.getY()<HEIGHT-SIZE-2*SEP){
-				int x=(int)(t.getX()-SEP)/(int)(SEP+SIZE);
-				int y=(int)(t.getY()-SEP)/(int)(SEP+SIZE);
-				if(Grid[y+1][x]==0){
-					remove(t.tile);
-					t.setY((int)(t.getY()+SIZE+SEP));
-					remove(t.l);
-					add(t.tile,t.getX(),t.getY());
-					add(t.l,t.getX()+40,t.getY()+40);
-					System.out.println("Down \n");
-					Grid[y+1][x]=Grid[y][x];
-					Grid[y][x]=0;
-					available.add(new Point(x,y));
-					available.remove(new Point(x,y+1));
-					changed=true;
-				}
-				else if(Grid[y+1][x]==Grid[y][x]){
-					t.setY((int)(t.getY()+SIZE+SEP));
-					Tile t1 = null;
-					for(Tile t2:tiles){
-						if(t2.getGridX()==x&&t2.getGridY()==y+1){
-							t1=t2;
-						}
-					}
-					System.out.println("Combined tiles to "+t1.getX()+","+t1.getY());
-					t.setValue(t.getValue()*2);
-					remove(t1.l);
-					remove(t1.tile);
-					remove(t.tile);
-					remove(t.l);
 
-					add(t.tile,t.getX(),t.getY());
-					add(t.l,t.getX()+40,t.getY()+40);
-					tiles.remove(t1);
-					Grid[y][x]=0;
-					Grid[y+1][x]*=2;
-					available.add(new Point(x,y));
-					available.remove(new Point(x,y+1));
-					changed=true;
+		for(int i = ROWS-2; i >= 0  ; i-- ) // i is rows
+		{
+			for(int j = 0; j < COLUMNS; j++)
+			{
+				if(Grid[i][j]!=null){
+					if(Grid [i+1][j]==null )
+					{
+						Grid[i+1][j] = Grid [i][j];
+						remove(Grid[i][j].tile);
+						remove(Grid[i][j].l);
+						Grid [i][j] = null;
+
+						Grid[i+1][j].setY((int)(Grid[i+1][j].getY()+SIZE+SEP));
+						add(Grid[i+1][j].tile,Grid[i+1][j].getX(),Grid[i+1][j].getY());
+						add(Grid[i+1][j].l,Grid[i+1][j].getX()+40,Grid[i+1][j].getY()+40);	
+						changed = true;
+					}
+					else if(Grid [i][j].getValue() == Grid [i+1][j].getValue())
+					{
+						remove(Grid[i][j].tile);
+						remove(Grid[i][j].l);
+
+						Grid[i][j] = null;
+						Grid[i+1][j].mult();
+//						remove(Grid[i+1][j].tile);
+//						add(Grid[i+1][j].tile);
+//
+//						remove(Grid[i+1][j].l);
+//						add(Grid[i+1][j].l,Grid[i+1][j].getX()+40,Grid[i+1][j].getY()+40);	
+
+						changed = true;
+					}
 				}
 			}
-			t.tile.setColor(t.colors[(int)(Math.log(t.value)/Math.log(2)) -1]);
+		}
+		
+		available = new ArrayList<Point>();
+		for (int i = 0; i < Grid.length; i++) {
+			for (int m = 0; m < Grid.length; m++) {
+				if(Grid[i][m]==null){available.add(new Point(i,m));}
+			}
 		}
 		
 		if(changed){addRandom(1);}
@@ -202,102 +179,97 @@ public class GUI extends GraphicsProgram implements KeyListener{
 
 	public void left(){
 		boolean changed = false;
-		for (int i = 0; i < tiles.size(); i++) {
-			Tile t = tiles.get(i);
-			if(t.getX()>SEP){
-				int x=(int)(t.getX()-SEP)/(int)(SEP+SIZE);
-				int y=(int)(t.getY()-SEP)/(int)(SEP+SIZE);
-				if(Grid[y][x-1]==0){
-					remove(t.tile);
-					remove(t.l);
-					t.setX((int)(t.getX()-SIZE-SEP));
-					add(t.tile,t.getX(),t.getY());
-					add(t.l,t.getX()+40,t.getY()+40);
-					Grid[y][x-1]=Grid[y][x];
-					Grid[y][x]=0;
-					available.add(new Point(x,y));
-					available.remove(new Point(x-1,y));
-					changed=true;
-				}
-				else if(Grid[y][x-1]==Grid[y][x]){
-					Tile t1 = null;
-					t.setX((int)(t.getX()-SIZE-SEP));
 
-					for(Tile t2:tiles){
-						if(t2.getGridX()==x-1&&t2.getGridY()==y){
-							t1=t2;
-						}
+		for(int j = 1; j < COLUMNS; j++ ) // J = columns
+		{
+			for(int i = 0; i < ROWS; i++)
+			{
+				if(Grid[i][j]!=null){
+					if(Grid [i][j-1]==null )
+					{
+						Grid[i][j-1] = Grid [i][j];
+						remove(Grid[i][j].tile);
+						remove(Grid[i][j].l);
+						Grid [i][j] = null;
+						Grid[i][j-1].setX((int)(Grid[i][j-1].getX()-SIZE-SEP));
+						add(Grid[i][j-1].tile,Grid[i][j-1].getX(),Grid[i][j-1].getY());
+						add(Grid[i][j-1].l,Grid[i][j-1].getX()+40,Grid[i][j-1].getY()+40);	
+						changed = true;
 					}
-					System.out.println("Combined tiles to "+t1.getX()+","+t1.getY());
-					t.setValue(t.getValue()*2);
-					remove(t1.l);
-					remove(t1.tile);
-					remove(t.tile);
-					remove(t.l);
+					else if(Grid [i][j].getValue() == Grid [i][j-1].getValue())
+					{
+						remove(Grid[i][j].tile);
+						remove(Grid[i][j].l);
 
-					add(t.tile,t.getX(),t.getY());
-					add(t.l,t.getX()+40,t.getY()+40);
-					tiles.remove(t1);
-					Grid[y][x]=0;
-					Grid[y][x-1]*=2;
-					changed=true;
-					available.add(new Point(x,y));
-					available.remove(new Point(x-1,y));
+						Grid[i][j] = null;
+						Grid[i][j-1].mult();
+//						remove(Grid[i][j-1].tile);
+//						add(Grid[i][j-1].tile);
+//
+//						remove(Grid[i][j-1].l);
+//						add(Grid[i][j-1].l,Grid[i][j-1].getX()+40,Grid[i][j-1].getY()+40);	
+
+						changed = true;
+					}
 				}
 			}
-			t.tile.setColor(t.colors[(int)(Math.log(t.value)/Math.log(2)) -1]);
 		}
-
+		
+		available = new ArrayList<Point>();
+		for (int i = 0; i < Grid.length; i++) {
+			for (int m = 0; m < Grid.length; m++) {
+				if(Grid[i][m]==null){available.add(new Point(i,m));}
+			}
+		}
+		
 		if(changed){addRandom(1);}
+
 	}
 
 	public void right(){
 		boolean changed = false;
 
-		for (int i = 0; i < tiles.size(); i++) {
-			Tile t = tiles.get(i);
-			if(t.getX()<WIDTH-SIZE-2*SEP){
-				int x=(int)(t.getX()-SEP)/(int)(SEP+SIZE);
-				int y=(int)(t.getY()-SEP)/(int)(SEP+SIZE);
-				if(Grid[y][x+1]==0){
-					remove(t.tile);
-					remove(t.l);
-					t.setX((int)(t.getX()+SIZE+SEP));
-					add(t.tile,t.getX(),t.getY());
-					add(t.l,t.getX()+40,t.getY()+40);
-					Grid[y][x+1]=Grid[y][x];
-					Grid[y][x]=0;
-					available.add(new Point(x,y));
-					available.remove(new Point(x+1,y));
-					changed=true;
-				}
-				else if(Grid[y][x+1]==Grid[y][x]){
-					Tile t1 = null;
-					t.setX((int)(t.getX()+SIZE+SEP));
-					for(Tile t2:tiles){
-						if(t2.getGridX()==x+1&&t2.getGridY()==y){
-							t1=t2;
-						}
+		for(int j = COLUMNS-2; j >=0 ; j-- ) // J = columns
+		{
+			for(int i = 0; i < ROWS; i++)
+			{
+				if(Grid[i][j]!=null){
+					if(Grid [i][j+1]==null )
+					{
+						Grid[i][j+1] = Grid [i][j];
+						remove(Grid[i][j].tile);
+						remove(Grid[i][j].l);
+						Grid [i][j] = null;
+						Grid[i][j+1].setX((int)(Grid[i][j+1].getX()+SIZE+SEP));
+						add(Grid[i][j+1].tile,Grid[i][j+1].getX(),Grid[i][j+1].getY());
+						add(Grid[i][j+1].l,Grid[i][j+1].getX()+40,Grid[i][j+1].getY()+40);	
+						changed = true;
 					}
-					System.out.println("Combined tiles to "+t1.getX()+","+t1.getY());
-					t.setValue(t.getValue()*2);
-					remove(t1.l);
-					remove(t1.tile);
-					remove(t.tile);
-					remove(t.l);
+					else if(Grid [i][j].getValue() == Grid [i][j+1].getValue())
+					{
+						remove(Grid[i][j].tile);
+						remove(Grid[i][j].l);
 
-					add(t.tile,t.getX(),t.getY());
-					add(t.l,t.getX()+40,t.getY()+40);
-					tiles.remove(t1);
-					Grid[y][x]=0;
-					Grid[y][x+1]*=2;
-					available.add(new Point(x,y));
-					available.remove(new Point(x+1,y));
-					changed=true;
+						Grid[i][j] = null;
+						Grid[i][j+1].mult();
+//						remove(Grid[i][j+1].tile);
+//						add(Grid[i][j+1].tile);
+//
+//						remove(Grid[i][j+1].l);
+//						add(Grid[i][j+1].l,Grid[i][j+1].getX()+40,Grid[i][j+1].getY()+40);	
+
+						changed = true;
+					}
 				}
+
 			}
-			t.tile.setColor(t.colors[(int)(Math.log(t.value)/Math.log(2)) -1]);
-			System.out.println((int)(Math.log(t.value)/Math.log(2))-1);
+		}
+		
+		available = new ArrayList<Point>();
+		for (int i = 0; i < Grid.length; i++) {
+			for (int m = 0; m < Grid.length; m++) {
+				if(Grid[i][m]==null){available.add(new Point(i,m));}
+			}
 		}
 		
 		if(changed){addRandom(1);}
@@ -312,32 +284,34 @@ public class GUI extends GraphicsProgram implements KeyListener{
 		int keyCode = e.getKeyCode();
 		if (keyCode == 37) // left Key
 		{
-			//System.out.println("left");
+			System.out.println("left");
 			left();
 
 		}
 		else if (keyCode == 38) // up
 		{
-			//System.out.println("up");
+			System.out.println("up");
 			up();
 
 		}
 		else if (keyCode == 39) // right
 		{
-			//System.out.println("right");
+			System.out.println("right");
 			right();
 		}
 		else if (keyCode == 40) // down
 		{
-			//System.out.println("down");
+			System.out.println("down");
 			down();
 		}
-		System.out.println();
 		for(int i=0;i<Grid.length;i++){
 			for(int j=0;j<Grid[0].length;j++){
-				System.out.print(Grid[i][j]+" ");}
+				if(Grid[i][j]!=null){System.out.print(Grid[i][j].getValue()+" ");}
+				else{System.out.print("0 ");}
+			}
 			System.out.println();
 		}
+		System.out.println();
 
 	}
 }
