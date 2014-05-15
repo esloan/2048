@@ -17,17 +17,17 @@ public class GUI extends GraphicsProgram implements KeyListener{
 	private static final double HEIGHT = ROWS * (SIZE + SEP) + SEP;
 	private Tile[][] Grid = new Tile[ROWS][COLUMNS];
 	ArrayList<Point> available = new ArrayList<Point>();
+	GRect[][] grid = new GRect[ROWS][COLUMNS];
 
 	public void init() {
 		// setBackground(Color.blue);//sets background color
 
-		GRect[][] grid = new GRect[ROWS][COLUMNS];
 		for (int i = 0; i < ROWS; i++) {
 			for (int j = 0; j < COLUMNS; j++) {
 				grid[i][j] = new GRoundRect(SIZE, SIZE);
 				grid[i][j].setFilled(true);
-				grid[i][j].setFillColor(Color.MAGENTA);
-				add(grid[i][j], SEP + (SIZE + SEP) * i, SEP + (SIZE + SEP)* j);
+				grid[i][j].setFillColor(Color.GRAY);
+				//add(grid[i][j], SEP + (SIZE + SEP) * i, SEP + (SIZE + SEP)* j);
 				Grid[i][j]=null;
 			}
 		}
@@ -51,6 +51,21 @@ public class GUI extends GraphicsProgram implements KeyListener{
 		if(!isStarted()){
 			start(sizeArgs);}
 
+		removeAll();
+		for(int i=0;i<Grid.length;i++){
+			for(int j=0;j<Grid[0].length;j++){
+				if(Grid[i][j]!=null){
+					add(Grid[i][j].tile);
+					add(Grid[i][j].l);
+					System.out.print((Grid[i][j].getValue())+" ");}
+				else{System.out.print("0 ");}
+				add(grid[i][j], SEP + (SIZE + SEP) * i, SEP + (SIZE + SEP)* j);
+				grid[i][j].sendToBack();
+			}
+			System.out.println();
+		}
+		System.out.println();
+
 	}
 
 	/**
@@ -59,15 +74,18 @@ public class GUI extends GraphicsProgram implements KeyListener{
 	private void addRandom(int n) {
 
 		Random r = new Random();
-		if (available.isEmpty()) {
-			return;
-		}
 		for (int i = 0; i < n; i++) {
-			Point p = available.get(r.nextInt(available.size()));
-			Grid[(int) p.getY()][(int) p.getX()] = new Tile((int) (p.getX()*(SIZE+SEP)+SEP), (int) (p.getY()*(SIZE + SEP)+SEP),r.nextInt(4)==1?4:2);
-			add(Grid[(int) p.getY()][(int) p.getX()].tile);
-			add(Grid[(int) p.getY()][(int) p.getX()].l);
-			available.remove(p);
+			boolean t=true;
+			while(t){
+				Point p = available.get(r.nextInt(available.size()));
+				if(Grid[(int) p.getY()][(int) p.getX()]==null){
+					t=false;
+					Grid[(int) p.getY()][(int) p.getX()] = new Tile((int) (p.getX()*(SIZE+SEP)+SEP), (int) (p.getY()*(SIZE + SEP)+SEP),r.nextInt(4)==1?4:2);
+					//			add(Grid[(int) p.getY()][(int) p.getX()].tile);
+					//			add(Grid[(int) p.getY()][(int) p.getX()].l);
+				}
+			}
+			System.out.println("new tile");
 		}
 
 
@@ -92,40 +110,34 @@ public class GUI extends GraphicsProgram implements KeyListener{
 					if(Grid [i-1][j]==null )		//Checks to see if the space above is empty
 					{
 						Grid[i-1][j] = Grid [i][j]; // "Moves" the idea of a tile in the grid
-						remove(Grid[i][j].tile);	// removes old tile from screen
-						remove(Grid[i][j].l);		// removes old label from screen
+						//						remove(Grid[i][j].tile);	// removes old tile from screen
+						//						remove(Grid[i][j].l);		// removes old label from screen
 						Grid [i][j] = null;			// removes old tile from grid
 						Grid[i-1][j].setY((int) (Grid[i-1][j].getY()-SEP-SIZE));			//  Sets new y value
-						add(Grid[i-1][j].tile,Grid[i-1][j].getX(),Grid[i-1][j].getY());		//  adds new tile to grid
-						add(Grid[i-1][j].l,Grid[i-1][j].getX()+40,Grid[i-1][j].getY()+40);	//  adds new label to grid
+						//						add(Grid[i-1][j].tile,Grid[i-1][j].getX(),Grid[i-1][j].getY());		//  adds new tile to grid
+						//						add(Grid[i-1][j].l,Grid[i-1][j].getX()+40,Grid[i-1][j].getY()+40);	//  adds new label to grid
 						changed = true;														//  Allows for new tile to be added
 					}
 					else if(Grid [i][j].getValue() == Grid [i-1][j].getValue())				// Checks to see if it can merge
 					{
-						remove(Grid[i][j].tile);		//removes old tile
-						remove(Grid[i][j].l);			// removes old label 
+						//						remove(Grid[i][j].tile);		//removes old tile
+						//						remove(Grid[i][j].l);			// removes old label 
 						Grid[i][j] = null;				//remves old tile from grid
 						Grid[i-1][j].mult();			//Changes value + Color
-//						remove(Grid[i-1][j].tile);	
-//						add(Grid[i-1][j].tile);
-//
-//						remove(Grid[i-1][j].l);
-//						add(Grid[i-1][j].l,Grid[i-1][j].getX()+40,Grid[i-1][j].getY()+40);
+						//						remove(Grid[i-1][j].tile);	
+						//						add(Grid[i-1][j].tile);
+						//
+						//						remove(Grid[i-1][j].l);
+						//						add(Grid[i-1][j].l,Grid[i-1][j].getX()+40,Grid[i-1][j].getY()+40);
 
 						changed = true;					// alows new tile to be added
 					}
 				}
 			}
 		}
-		available = new ArrayList<Point>();
-		for (int i = 0; i < Grid.length; i++) {
-			for (int m = 0; m < Grid.length; m++) { 
-				if(Grid[i][m]==null){available.add(new Point(i,m));}   // creates list of empty spaces
-			}
-		}
-		
+
 		if(changed){addRandom(1);}	// adds new tile
-		
+
 	}
 
 	public void down(){
@@ -139,41 +151,34 @@ public class GUI extends GraphicsProgram implements KeyListener{
 					if(Grid [i+1][j]==null )
 					{
 						Grid[i+1][j] = Grid [i][j];
-						remove(Grid[i][j].tile);
-						remove(Grid[i][j].l);
+						//						remove(Grid[i][j].tile);
+						//						remove(Grid[i][j].l);
 						Grid [i][j] = null;
 
 						Grid[i+1][j].setY((int)(Grid[i+1][j].getY()+SIZE+SEP));
-						add(Grid[i+1][j].tile,Grid[i+1][j].getX(),Grid[i+1][j].getY());
-						add(Grid[i+1][j].l,Grid[i+1][j].getX()+40,Grid[i+1][j].getY()+40);	
+						//						add(Grid[i+1][j].tile,Grid[i+1][j].getX(),Grid[i+1][j].getY());
+						//						add(Grid[i+1][j].l,Grid[i+1][j].getX()+40,Grid[i+1][j].getY()+40);	
 						changed = true;
 					}
 					else if(Grid [i][j].getValue() == Grid [i+1][j].getValue())
 					{
-						remove(Grid[i][j].tile);
-						remove(Grid[i][j].l);
+						//						remove(Grid[i][j].tile);
+						//						remove(Grid[i][j].l);
 
 						Grid[i][j] = null;
 						Grid[i+1][j].mult();
-//						remove(Grid[i+1][j].tile);
-//						add(Grid[i+1][j].tile);
-//
-//						remove(Grid[i+1][j].l);
-//						add(Grid[i+1][j].l,Grid[i+1][j].getX()+40,Grid[i+1][j].getY()+40);	
+						//						remove(Grid[i+1][j].tile);
+						//						add(Grid[i+1][j].tile);
+						//
+						//						remove(Grid[i+1][j].l);
+						//						add(Grid[i+1][j].l,Grid[i+1][j].getX()+40,Grid[i+1][j].getY()+40);	
 
 						changed = true;
 					}
 				}
 			}
 		}
-		
-		available = new ArrayList<Point>();
-		for (int i = 0; i < Grid.length; i++) {
-			for (int m = 0; m < Grid.length; m++) {
-				if(Grid[i][m]==null){available.add(new Point(i,m));}
-			}
-		}
-		
+
 		if(changed){addRandom(1);}
 	}
 
@@ -188,40 +193,33 @@ public class GUI extends GraphicsProgram implements KeyListener{
 					if(Grid [i][j-1]==null )
 					{
 						Grid[i][j-1] = Grid [i][j];
-						remove(Grid[i][j].tile);
-						remove(Grid[i][j].l);
+						//						remove(Grid[i][j].tile);
+						//						remove(Grid[i][j].l);
 						Grid [i][j] = null;
 						Grid[i][j-1].setX((int)(Grid[i][j-1].getX()-SIZE-SEP));
-						add(Grid[i][j-1].tile,Grid[i][j-1].getX(),Grid[i][j-1].getY());
-						add(Grid[i][j-1].l,Grid[i][j-1].getX()+40,Grid[i][j-1].getY()+40);	
+						//						add(Grid[i][j-1].tile,Grid[i][j-1].getX(),Grid[i][j-1].getY());
+						//						add(Grid[i][j-1].l,Grid[i][j-1].getX()+40,Grid[i][j-1].getY()+40);	
 						changed = true;
 					}
 					else if(Grid [i][j].getValue() == Grid [i][j-1].getValue())
 					{
-						remove(Grid[i][j].tile);
-						remove(Grid[i][j].l);
+						//						remove(Grid[i][j].tile);
+						//						remove(Grid[i][j].l);
 
 						Grid[i][j] = null;
 						Grid[i][j-1].mult();
-//						remove(Grid[i][j-1].tile);
-//						add(Grid[i][j-1].tile);
-//
-//						remove(Grid[i][j-1].l);
-//						add(Grid[i][j-1].l,Grid[i][j-1].getX()+40,Grid[i][j-1].getY()+40);	
+						//						remove(Grid[i][j-1].tile);
+						//						add(Grid[i][j-1].tile);
+						//
+						//						remove(Grid[i][j-1].l);
+						//						add(Grid[i][j-1].l,Grid[i][j-1].getX()+40,Grid[i][j-1].getY()+40);	
 
 						changed = true;
 					}
 				}
 			}
 		}
-		
-		available = new ArrayList<Point>();
-		for (int i = 0; i < Grid.length; i++) {
-			for (int m = 0; m < Grid.length; m++) {
-				if(Grid[i][m]==null){available.add(new Point(i,m));}
-			}
-		}
-		
+
 		if(changed){addRandom(1);}
 
 	}
@@ -237,41 +235,22 @@ public class GUI extends GraphicsProgram implements KeyListener{
 					if(Grid [i][j+1]==null )
 					{
 						Grid[i][j+1] = Grid [i][j];
-						remove(Grid[i][j].tile);
-						remove(Grid[i][j].l);
 						Grid [i][j] = null;
 						Grid[i][j+1].setX((int)(Grid[i][j+1].getX()+SIZE+SEP));
-						add(Grid[i][j+1].tile,Grid[i][j+1].getX(),Grid[i][j+1].getY());
-						add(Grid[i][j+1].l,Grid[i][j+1].getX()+40,Grid[i][j+1].getY()+40);	
 						changed = true;
 					}
 					else if(Grid [i][j].getValue() == Grid [i][j+1].getValue())
 					{
-						remove(Grid[i][j].tile);
-						remove(Grid[i][j].l);
 
 						Grid[i][j] = null;
 						Grid[i][j+1].mult();
-//						remove(Grid[i][j+1].tile);
-//						add(Grid[i][j+1].tile);
-//
-//						remove(Grid[i][j+1].l);
-//						add(Grid[i][j+1].l,Grid[i][j+1].getX()+40,Grid[i][j+1].getY()+40);	
-
+						
 						changed = true;
 					}
 				}
 
 			}
 		}
-		
-		available = new ArrayList<Point>();
-		for (int i = 0; i < Grid.length; i++) {
-			for (int m = 0; m < Grid.length; m++) {
-				if(Grid[i][m]==null){available.add(new Point(i,m));}
-			}
-		}
-		
 		if(changed){addRandom(1);}
 	}
 
@@ -286,32 +265,53 @@ public class GUI extends GraphicsProgram implements KeyListener{
 		{
 			System.out.println("left");
 			left();
+			System.out.println("panic!");
 
 		}
 		else if (keyCode == 38) // up
 		{
 			System.out.println("up");
 			up();
+			System.out.println("panic!");
 
 		}
 		else if (keyCode == 39) // right
 		{
 			System.out.println("right");
 			right();
+			System.out.println("panic!");
 		}
 		else if (keyCode == 40) // down
 		{
 			System.out.println("down");
 			down();
+			System.out.println("panic!");
 		}
+		removeAll();
 		for(int i=0;i<Grid.length;i++){
 			for(int j=0;j<Grid[0].length;j++){
-				if(Grid[i][j]!=null){System.out.print(Grid[i][j].getValue()+" ");}
+				if(Grid[i][j]!=null){
+					Grid[i][j].tile.sendToFront();
+					add(Grid[i][j].tile,Grid[i][j].getX(),Grid[i][j].getY());
+					add(Grid[i][j].l,Grid[i][j].getX()+40,Grid[i][j].getY()+40);
+					Grid[i][j].l.sendToFront();
+					System.out.print((Grid[i][j].getValue())+" ");}
 				else{System.out.print("0 ");}
+				add(grid[i][j], SEP + (SIZE + SEP) * i, SEP + (SIZE + SEP)* j);
+				grid[i][j].sendToBack();
 			}
 			System.out.println();
 		}
 		System.out.println();
+
+		//		for(int i=0;i<Grid.length;i++){
+		//			for(int j=0;j<Grid[0].length;j++){
+		//				if(Grid[i][j]!=null){System.out.print(Grid[i][j].getValue()+" ");}
+		//				else{System.out.print("0 ");}
+		//			}
+		//			System.out.println();
+		//		}
+		//		System.out.println();
 
 	}
 }
